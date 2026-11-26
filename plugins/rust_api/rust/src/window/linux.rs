@@ -337,6 +337,7 @@ unsafe extern "C" fn on_restore_settled(_: gpointer) -> gboolean {
 }
 
 unsafe extern "C" fn on_settle_timeout(_: gpointer) -> gboolean {
+    reallocate_view();
     STATE.with(|state| {
         state.settle_timeout.set(0);
         let Some(current) = state.geometry() else {
@@ -400,10 +401,7 @@ unsafe extern "C" fn on_delete(_: *mut GtkWidget, _: *mut GdkEvent, _: gpointer)
 // the view, is allocated again; see .agents/flutter-upgrade.md.
 unsafe extern "C" fn on_map_event(_: *mut GtkWidget, _: *mut GdkEvent, _: gpointer) -> gboolean {
     STATE.with(|state| {
-        let view = state.view.get();
-        if !view.is_null() {
-            queue_resize_tree(view, null_mut());
-        }
+        post(Box::new(reallocate_view));
         state.on_map();
     });
     GFALSE
@@ -416,6 +414,15 @@ unsafe extern "C" fn queue_resize_tree(widget: *mut GtkWidget, _: gpointer) {
     if is_a(widget.cast(), gtk_sys::gtk_container_get_type()) {
         gtk_sys::gtk_container_forall(widget.cast(), Some(queue_resize_tree), null_mut());
     }
+}
+
+fn reallocate_view() {
+    STATE.with(|state| {
+        let view = state.view.get();
+        if !view.is_null() {
+            unsafe { queue_resize_tree(view, null_mut()) };
+        }
+    });
 }
 
 unsafe extern "C" fn on_configure(_: *mut GtkWidget, _: *mut GdkEvent, _: gpointer) -> gboolean {
