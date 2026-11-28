@@ -1,5 +1,28 @@
 # 收尾状态
 
+## 2026-11-28 同步上游主分支 + 保留 HTTPS 与内核更新
+### 本次完成
+- 把上游 `origin/main`（`chen08209/FlClash`）的更新同步进本分支：`git rebase origin/main` 以最新主分支
+  （领先 111 个 commit）为基线，本分支 5 个 commit 线性重放，无冲突。其中“bump Clash.Meta”一笔因内容与
+  上游等价被 rebase 自动 drop，最终本分支独有 6 个 commit（含一条把 submodule URL 改 HTTPS）。
+- 按用户要求：`.gitmodules` 的两个 submodule URL 保留为 **HTTPS**；`core/Clash.Meta` 采用更新后的
+  `fea2926`（恰好等于上游主分支记录的内核指针）。
+- `git submodule update` 把工作区 submodule 同步到主分支记录指针：`plugins/prism_ui` → `cae9a435`
+  （上游已全面迁到新 `measure` 返回函数 API）。
+### 未完成与挂账
+- 内核重编后 `FlClashCore` 的 setuid 权限丢失：下次用虚拟网卡/TUN 前需重设 `-rwsr-x--- root <user>`。
+- MCP（`http://127.0.0.1:39789/mcp`）是否登记进 Codex 端配置，待用户决定（沿用）。
+- 上游 PR 投递仍待办（上游关闭 PR，改走 Issue）。
+### 验证与版本
+- `flutter pub get`：Got dependencies，`pubspec.lock` 无改动（与上游一致）。
+- 全量 `flutter analyze --no-fatal-infos`：No issues found。
+- `flutter build linux --release`：✓ Built（二次构建消除 “File modified during build” 提示）。
+- 本机 Flutter 3.50.1，与上游 `0ff56e5b fix(linux): build releases with Flutter 3.50.1` 一致。
+- 分支 `fix/linux-wayland-subsurface-resize`；rebase 改写历史，fork 需 `--force-with-lease` 推送。
+### 跳过项
+- 未跑全量 `flutter test`：本轮为 git 同步（rebase + submodule 对齐），无新增/改动 Dart 逻辑；
+  上游 `main` 自带其测试套件。
+
 ## 2026-11-28 内建 MCP server + 本地构建联网诊断
 ### 本次完成
 - 新增 `lib/mcp/mcp_server.dart`：回环口内建 MCP server（仅当 `FLCLASH_MCP_PORT` 设置时启用），
