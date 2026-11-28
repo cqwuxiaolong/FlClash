@@ -44,5 +44,15 @@ if pgrep -x FlClash >/dev/null 2>&1; then
   echo "      如看不到窗口，请先退出已安装的 FlClash 再重试。" >&2
 fi
 
+# 测试/调试用：默认在回环口启用内建 MCP server（可用 FLCLASH_MCP_PORT 覆盖，设空字符串则禁用）。
+# 工具：status / set_running / set_mode / change_proxy / groups / logs。
+export FLCLASH_MCP_PORT="${FLCLASH_MCP_PORT-39789}"
+
+# 便携模式：绕过 systemd helper service（满足"不要服务"），改走 app 直接接管监听 + setuid 内核。
+# 设 FLCLASH_PORTABLE=0 可关闭（回到需要 helper service 的常规模式，那时 TUN/虚拟网卡才可用）。
+if [[ "${FLCLASH_PORTABLE:-1}" != "0" ]]; then
+  export APPIMAGE="${APPIMAGE:-$HOME/.local/share/com.follow.clash.portable}"
+fi
+
 echo "启动：$bin $*"
 exec "$bin" "$@"

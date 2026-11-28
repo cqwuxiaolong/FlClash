@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="generator" content="tool/status_html.mjs v1.2">
-<title>STATUS.md · HTML 快照（2026-11-26 15:21:40 +08:00）</title>
+<title>STATUS.md · HTML 快照（2026-11-28 11:14:18 +08:00）</title>
 <style>
 :root{color-scheme:light dark;--fg:#1c1f24;--fg-soft:#4b5563;--bg:#fbfbfd;--panel:#fff;--line:#d9dce3;--accent:#2b5fd9;--code:#f2f4f8;}
 @media (prefers-color-scheme:dark){:root{--fg:#e6e8ee;--fg-soft:#a7afbd;--bg:#16181d;--panel:#1e2128;--line:#33373f;--accent:#7aa2ff;--code:#242833;}}
@@ -44,41 +44,57 @@ img{max-width:100%;height:auto}
 </head>
 <body>
 <div class="wrap">
-<nav class="toc" aria-label="目录"><h2>目录（10）</h2><ol>
-<li class="l2"><a href="#sec-1">2026-11-26 本地启动脚本 + Wayland 视觉确认</a></li>
+<nav class="toc" aria-label="目录"><h2>目录（15）</h2><ol>
+<li class="l2"><a href="#sec-1">2026-11-28 内建 MCP server + 本地构建联网诊断</a></li>
 <li class="l3"><a href="#sec-2">本次完成</a></li>
 <li class="l3"><a href="#sec-3">未完成与挂账</a></li>
 <li class="l3"><a href="#sec-4">验证与版本</a></li>
 <li class="l3"><a href="#sec-5">跳过项</a></li>
-<li class="l2"><a href="#sec-6">2026-11-26 Linux/Wayland 黑屏修复</a></li>
+<li class="l2"><a href="#sec-6">2026-11-26 本地启动脚本 + Wayland 视觉确认</a></li>
 <li class="l3"><a href="#sec-7">本次完成</a></li>
 <li class="l3"><a href="#sec-8">未完成与挂账</a></li>
 <li class="l3"><a href="#sec-9">验证与版本</a></li>
 <li class="l3"><a href="#sec-10">跳过项</a></li>
+<li class="l2"><a href="#sec-11">2026-11-26 Linux/Wayland 黑屏修复</a></li>
+<li class="l3"><a href="#sec-12">本次完成</a></li>
+<li class="l3"><a href="#sec-13">未完成与挂账</a></li>
+<li class="l3"><a href="#sec-14">验证与版本</a></li>
+<li class="l3"><a href="#sec-15">跳过项</a></li>
 </ol></nav>
-<main><header class="meta">源文件：<b>STATUS.md</b>（2466 字节 / 36 行 · sha256 <code>08e2f1fcc25603933a7d68905d9fef4d2765a04d2e1476fbcd15b4bf48fbc0c1</code>）<br>本 HTML 由 <code>tool/status_html.mjs v1.2</code> 于 <b>2026-11-26 15:21:40 +08:00</b> 生成；单文件、内嵌 CSS、零外部资源，可直接双击本地打开。<br>正文与 md <b>逐字一致</b>（自检口径见页脚：剥掉三类标记符与空白后逐字符比对）；审校无误后方可提交。</header>
+<main><header class="meta">源文件：<b>STATUS.md</b>（5185 字节 / 68 行 · sha256 <code>e90db9315a1bfd684114e0aa4bb59fc944d25e41cc0afb7d27dae19684f1f1c4</code>）<br>本 HTML 由 <code>tool/status_html.mjs v1.2</code> 于 <b>2026-11-28 11:14:18 +08:00</b> 生成；单文件、内嵌 CSS、零外部资源，可直接双击本地打开。<br>正文与 md <b>逐字一致</b>（自检口径见页脚：剥掉三类标记符与空白后逐字符比对）；审校无误后方可提交。</header>
 <article id="hol-status-md">
 <h1 id="sec-0">收尾状态</h1>
-<h2 id="sec-1">2026-11-26 本地启动脚本 + Wayland 视觉确认</h2>
+<h2 id="sec-1">2026-11-28 内建 MCP server + 本地构建联网诊断</h2>
 <h3 id="sec-2">本次完成</h3>
-<ul><li>新增 <code>run-linux.sh</code>：启动本地构建产物（自动选 release/debug），原生 Wayland 优先<br>（有 <code>WAYLAND_DISPLAY</code> 且未显式设 <code>GDK_BACKEND</code> 时导出 <code>GDK_BACKEND=wayland</code>，不走 XWayland），<br>并在检测到已运行实例时提示单实例转发风险。<code>bash -n</code> 语法自检通过。</li><li>用户确认：上一轮的 Wayland 黑屏修复在真机 Wayland 下<strong>已正常工作</strong>（黑屏消失）。</li><li>分支已推到 fork：<code>fix/linux-wayland-subsurface-resize</code> @ <code>362f5bd2</code>。</li></ul>
+<ul><li>新增 <code>lib/mcp/mcp_server.dart</code>：回环口内建 MCP server（仅当 <code>FLCLASH_MCP_PORT</code> 设置时启用），<br>用 Streamable-HTTP（JSON 单响应）实现 JSON-RPC 的 <code>initialize</code>/<code>tools/list</code>/<code>tools/call</code>/<code>ping</code>，<br>暴露 <code>status</code>/<code>set_running</code>/<code>set_mode</code>/<code>change_proxy</code>/<code>groups</code>/<code>logs</code> 六个工具，全部经<br><code>globalState.container</code> 调用 provider 与 action，使测试方可脱离 GUI 驱动内核。</li><li><code>lib/bootstrap.dart</code>：在 <code>initProvider=true</code> 之后 <code>unawaited(McpServer.tryStartFromEnvironment())</code>，<br>不阻塞启动时序；release 默认（未设环境变量）不启用。</li><li><code>run-linux.sh</code>：默认导出 <code>FLCLASH_MCP_PORT=39789</code>（可用 <code>FLCLASH_MCP_PORT</code> 覆盖、设空禁用）并默认<br>进入便携模式（<code>APPIMAGE</code>，可用 <code>FLCLASH_PORTABLE=0</code> 关闭）；脚本启动即自带 MCP、自动运行。</li><li>诊断本地构建无法上网根因：① 运行总开关从未下发（日志无 <code>listener.start</code>）；② Linux+systemd 下<br><code>hasHelperService=true</code>，监听交给缺失的 <code>flclash-helper.service</code>。便携模式（<code>hasHelperService=false</code>）</li></ul>
+<ul><li><code>autoRun</code> 后，监听与系统代理生效：<code>7890</code> 监听、<code>gsettings=manual</code>、代理访问 google 返回 <code>204</code>。</li></ul>
+<ul><li>修复编译：把 <code>plugins/prism_ui</code> 对齐主仓 pin 的 <code>6c47901</code>（工作区曾被推进到 <code>cae9a43</code>，新版<br><code>measure</code> 返回函数与主仓按 <code>double</code> 调用的代码不匹配）。</li></ul>
 <h3 id="sec-3">未完成与挂账</h3>
-<ul><li>上游投递方式待定：<code>chen08209/FlClash</code> 已<strong>关闭 Pull Requests</strong>（<code>GET/POST /pulls</code> 一律 404，<br>按钮置灰），无法建 PR；下一步改用 Issue 投递补丁，或按仓库 CONTRIBUTING 约定处理。</li></ul>
+<ul><li>便携模式下 TUN/虚拟网卡不可用（FlClash 对 AppImage 路径 <code>authorizeCore</code> 返回 error），仅走系统代理；<br>需 TUN 时用 <code>FLCLASH_PORTABLE=0</code> 并正确安装 helper service。</li><li>MCP 仅做 JSON 单响应，未实现 SSE/会话；暂未暴露 connections/带宽工具。</li><li>是否把该 MCP（<code>http://127.0.0.1:39789/mcp</code>）登记进 Codex 端配置，待用户决定。</li><li>上游 PR 投递仍待办（沿用上轮：上游关闭 PR，改走 Issue）。</li></ul>
 <h3 id="sec-4">验证与版本</h3>
-<ul><li>上游为网络根仓（<code>fork:false</code>，owner 个人账号）；fork 网络 4358 个仓。</li><li><code>gh</code> 令牌 scopes <code>gist, read:org, repo</code>；同仓（fork）建 PR 返回 201，跨仓建 PR 返回 404——<br>证明是上游关闭 PR，非账号/令牌权限问题。</li></ul>
+<ul><li><code>flutter analyze lib/mcp/mcp_server.dart lib/bootstrap.dart</code>：No issues。<code>flutter build linux --release</code>：✓ Built。</li><li>MCP 实测：<code>initialize</code>/<code>tools/list</code>/<code>tools/call</code> 正常；<code>status</code> 返回 running=true、coreStatus=connected、<br>mixedPort=7890；<code>ss</code> 显示 <code>127.0.0.1:7890 LISTEN(FlClashCore)</code>；<code>gsettings</code> 代理 mode=manual；<br><code>curl -x http://127.0.0.1:7890 …generate_204</code> = 204；<code>groups</code> 返回 OneX 分组与节点。</li><li>分支 <code>fix/linux-wayland-subsurface-resize</code>。</li></ul>
 <h3 id="sec-5">跳过项</h3>
-<ul><li>跳过 PR 创建：上游禁用 PR 功能（详见「未完成与挂账」）。</li><li><code>run-linux.sh</code> 提交时跳过 <code>flutter analyze</code>/<code>flutter test</code>：仅新增 shell 脚本，无 Dart 改动。</li></ul>
-<h2 id="sec-6">2026-11-26 Linux/Wayland 黑屏修复</h2>
+<ul><li>未跑全量 <code>flutter test</code>：本轮为独立新增 <code>mcp_server.dart</code> 与 bootstrap 启动注入，无 provider/模型/DB schema 改动。</li><li>TUN 真机验证跳过：便携模式按设计禁用 TUN。</li></ul>
+<h2 id="sec-6">2026-11-26 本地启动脚本 + Wayland 视觉确认</h2>
 <h3 id="sec-7">本次完成</h3>
-<ul><li>定位 Linux/Wayland 下 Flutter 内容只画在窗口左下角、其余为黑色背景的根因：<code>FlView</code> 的子表面<br>（subsurface）随控件 <code>size_allocate</code> 附着，而 GTK 在 map 事件之后才创建出新表面；<code>on_map_event</code><br>里原来同步调用 <code>queue_resize_tree</code> 跑得太早，画面停在 GL 原点的陈旧帧上。</li><li>在 <code>plugins/rust_api/rust/src/window/linux.rs</code> 修复：<code>on_map_event</code> 改为 <code>post(Box::new(reallocate_view))</code><br>延到 g_idle 确保表面已存在；新增共享 <code>reallocate_view()</code>；<code>on_settle_timeout</code> 顶部补一次以覆盖首次显示。</li><li>验证：<code>cargo check</code> 通过（无 warning）；debug bundle 重编 <code>librust_api.so</code> 通过；新增 0 行独立注释。</li></ul>
+<ul><li>新增 <code>run-linux.sh</code>：启动本地构建产物（自动选 release/debug），原生 Wayland 优先<br>（有 <code>WAYLAND_DISPLAY</code> 且未显式设 <code>GDK_BACKEND</code> 时导出 <code>GDK_BACKEND=wayland</code>，不走 XWayland），<br>并在检测到已运行实例时提示单实例转发风险。<code>bash -n</code> 语法自检通过。</li><li>用户确认：上一轮的 Wayland 黑屏修复在真机 Wayland 下<strong>已正常工作</strong>（黑屏消失）。</li><li>分支已推到 fork：<code>fix/linux-wayland-subsurface-resize</code> @ <code>362f5bd2</code>。</li></ul>
 <h3 id="sec-8">未完成与挂账</h3>
-<ul><li>（视觉确认已于 2026-11-26 由用户在真机 Wayland 完成，本条闭环。）</li></ul>
+<ul><li>上游投递方式待定：<code>chen08209/FlClash</code> 已<strong>关闭 Pull Requests</strong>（<code>GET/POST /pulls</code> 一律 404，<br>按钮置灰），无法建 PR；下一步改用 Issue 投递补丁，或按仓库 CONTRIBUTING 约定处理。</li></ul>
 <h3 id="sec-9">验证与版本</h3>
-<ul><li>Flutter 3.50.1；分支 <code>fix/linux-wayland-subsurface-resize</code>。</li><li><code>cargo check</code>：<code>Finished dev profile</code>（exit 0）。</li></ul>
+<ul><li>上游为网络根仓（<code>fork:false</code>，owner 个人账号）；fork 网络 4358 个仓。</li><li><code>gh</code> 令牌 scopes <code>gist, read:org, repo</code>；同仓（fork）建 PR 返回 201，跨仓建 PR 返回 404——<br>证明是上游关闭 PR，非账号/令牌权限问题。</li></ul>
 <h3 id="sec-10">跳过项</h3>
+<ul><li>跳过 PR 创建：上游禁用 PR 功能（详见「未完成与挂账」）。</li><li><code>run-linux.sh</code> 提交时跳过 <code>flutter analyze</code>/<code>flutter test</code>：仅新增 shell 脚本，无 Dart 改动。</li></ul>
+<h2 id="sec-11">2026-11-26 Linux/Wayland 黑屏修复</h2>
+<h3 id="sec-12">本次完成</h3>
+<ul><li>定位 Linux/Wayland 下 Flutter 内容只画在窗口左下角、其余为黑色背景的根因：<code>FlView</code> 的子表面<br>（subsurface）随控件 <code>size_allocate</code> 附着，而 GTK 在 map 事件之后才创建出新表面；<code>on_map_event</code><br>里原来同步调用 <code>queue_resize_tree</code> 跑得太早，画面停在 GL 原点的陈旧帧上。</li><li>在 <code>plugins/rust_api/rust/src/window/linux.rs</code> 修复：<code>on_map_event</code> 改为 <code>post(Box::new(reallocate_view))</code><br>延到 g_idle 确保表面已存在；新增共享 <code>reallocate_view()</code>；<code>on_settle_timeout</code> 顶部补一次以覆盖首次显示。</li><li>验证：<code>cargo check</code> 通过（无 warning）；debug bundle 重编 <code>librust_api.so</code> 通过；新增 0 行独立注释。</li></ul>
+<h3 id="sec-13">未完成与挂账</h3>
+<ul><li>（视觉确认已于 2026-11-26 由用户在真机 Wayland 完成，本条闭环。）</li></ul>
+<h3 id="sec-14">验证与版本</h3>
+<ul><li>Flutter 3.50.1；分支 <code>fix/linux-wayland-subsurface-resize</code>。</li><li><code>cargo check</code>：<code>Finished dev profile</code>（exit 0）。</li></ul>
+<h3 id="sec-15">跳过项</h3>
 <ul><li>跳过 <code>flutter analyze</code>/<code>flutter test</code>：本轮仅改 Rust，无 Dart 改动。</li></ul>
 </article></main>
-<footer class="meta">生成时刻 2026-11-26 15:21:40 +08:00 · 源 STATUS.md sha256 <code>08e2f1fcc25603933a7d68905d9fef4d2765a04d2e1476fbcd15b4bf48fbc0c1</code> · 正文 HTML sha256 <code>6e05af3707e8c545f8e4b6698925580e44c0ca712ad3fd6235c3f24274124f6d</code> · 目录项 10 条 · 生成器 tool/status_html.mjs v1.2<br>自检口径：md 剥语法标记 vs HTML 去标签还原实体，两侧各删掉 <code>*</code> / <code>&#96;</code> / <code>_</code> 标记符与全部空白后逐字符比对（主判据，结论 <code>TEXT_IDENTICAL</code> / <code>STATUS_HTML_CHECK_PASS</code>）；保留空白结构的次判据只打印 <code>WS_SENSITIVE_*</code> 不判红，详见生成器注释。</footer>
+<footer class="meta">生成时刻 2026-11-28 11:14:18 +08:00 · 源 STATUS.md sha256 <code>e90db9315a1bfd684114e0aa4bb59fc944d25e41cc0afb7d27dae19684f1f1c4</code> · 正文 HTML sha256 <code>1fae93b0041ae244a6505ca77eb86334b65c9f894ec26f0f14a11e0a46211426</code> · 目录项 15 条 · 生成器 tool/status_html.mjs v1.2<br>自检口径：md 剥语法标记 vs HTML 去标签还原实体，两侧各删掉 <code>*</code> / <code>&#96;</code> / <code>_</code> 标记符与全部空白后逐字符比对（主判据，结论 <code>TEXT_IDENTICAL</code> / <code>STATUS_HTML_CHECK_PASS</code>）；保留空白结构的次判据只打印 <code>WS_SENSITIVE_*</code> 不判红，详见生成器注释。</footer>
 </div>
 </body>
 </html>
